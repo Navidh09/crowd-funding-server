@@ -2,6 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const { ObjectId } = require("mongodb");
 const app = express();
 const port = process.env.PORT || 4000;
 
@@ -27,10 +28,23 @@ async function run() {
   try {
     const allCampaigns = client.db("campaignsDB").collection("campaigns");
 
-    app.post("/campaignDetails", async (req, res) => {
+    app.get("/campaigns", async (req, res) => {
+      const result = await allCampaigns.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/campaigns", async (req, res) => {
       const newCampaign = req.body;
       console.log(newCampaign);
       const result = await allCampaigns.insertOne(newCampaign);
+      res.send(result);
+    });
+
+    app.get("/campaign/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      console.log(id);
+      const result = await allCampaigns.findOne(query);
       res.send(result);
     });
     // Connect the client to the server	(optional starting in v4.7)
