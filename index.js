@@ -28,13 +28,18 @@ async function run() {
   try {
     const allCampaigns = client.db("campaignsDB").collection("campaigns");
     const donatedCollection = client.db("campaignsDB").collection("donations");
-    const userCollection = client.db("campaignsDB").collection("users");
 
-    app.post("/users", async (req, res) => {
-      const users = req.body;
-      const result = await userCollection.insertOne(users);
-      console.log(result);
+    app.post("/donations", async (req, res) => {
+      const myDonation = req.body;
+      const result = await donatedCollection.insertOne(myDonation);
       res.send(result);
+      console.log(result);
+    });
+
+    app.get("/donations", async (req, res) => {
+      const result = await donatedCollection.find().toArray();
+      res.send(result);
+      console.log(result);
     });
 
     app.get("/campaigns", async (req, res) => {
