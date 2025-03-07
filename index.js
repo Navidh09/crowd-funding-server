@@ -66,6 +66,12 @@ async function run() {
       const result = await allCampaigns.findOne(query);
       res.send(result);
     });
+    app.delete("/campaign/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allCampaigns.deleteOne(query);
+      res.send(result);
+    });
 
     app.patch("/update/:id", async (req, res) => {
       const id = req.params.id;
