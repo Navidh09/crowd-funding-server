@@ -28,22 +28,26 @@ async function run() {
   try {
     const allCampaigns = client.db("campaignsDB").collection("campaigns");
     const donatedCollection = client.db("campaignsDB").collection("donations");
+    const currentDate = new Date().toISOString();
 
     app.post("/donations", async (req, res) => {
       const myDonation = req.body;
       const result = await donatedCollection.insertOne(myDonation);
       res.send(result);
-      console.log(result);
     });
 
     app.get("/donations", async (req, res) => {
       const result = await donatedCollection.find().toArray();
       res.send(result);
-      console.log(result);
     });
 
     app.get("/campaigns", async (req, res) => {
       const result = await allCampaigns.find().toArray();
+      res.send(result);
+    });
+    app.get("/campaigns6", async (req, res) => {
+      const query = allCampaigns.find({ date: { $gte: currentDate } }).limit(6);
+      const result = await query.toArray();
       res.send(result);
     });
 
@@ -98,7 +102,7 @@ async function run() {
     });
 
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
