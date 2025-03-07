@@ -27,6 +27,15 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const allCampaigns = client.db("campaignsDB").collection("campaigns");
+    const donatedCollection = client.db("campaignsDB").collection("donations");
+    const userCollection = client.db("campaignsDB").collection("users");
+
+    app.post("/users", async (req, res) => {
+      const users = req.body;
+      const result = await userCollection.insertOne(users);
+      console.log(result);
+      res.send(result);
+    });
 
     app.get("/campaigns", async (req, res) => {
       const result = await allCampaigns.find().toArray();
@@ -35,7 +44,6 @@ async function run() {
 
     app.post("/campaigns", async (req, res) => {
       const newCampaign = req.body;
-      console.log(newCampaign);
       const result = await allCampaigns.insertOne(newCampaign);
       res.send(result);
     });
@@ -43,10 +51,41 @@ async function run() {
     app.get("/campaign/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      console.log(id);
       const result = await allCampaigns.findOne(query);
       res.send(result);
     });
+
+    app.get("/myCampaign", async (req, res) => {
+      const result = await allCampaigns.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allCampaigns.findOne(query);
+      res.send(result);
+    });
+
+    app.patch("/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const data = req.body;
+
+      const update = {
+        $set: {
+          title: data.title,
+          type: data.type,
+          photo: data.photo,
+          taka: data.taka,
+          date: data.date,
+          description: data.description,
+        },
+      };
+      const result = await allCampaigns.updateOne(query, update);
+      res.send(result);
+    });
+
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
